@@ -1,57 +1,20 @@
-package com.example.card_project.service;
+package com.example.cardProject.service;
 
-import com.example.card_project.exception.ErrorInputDataException;
-import com.example.card_project.exception.NonConfirmException;
-import com.example.card_project.exception.TransferErrorException;
-import com.example.card_project.model.*;
-import com.example.card_project.repository.CardRepository;
+import com.example.cardProject.exception.ErrorInputDataException;
+import com.example.cardProject.model.Amount;
+import com.example.cardProject.model.Card;
+import com.example.cardProject.model.Request;
+import com.example.cardProject.repository.CardRepositoryImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-
-@Slf4j
 @Service
-public class CardServiceImpl implements CardService {
-    private final CardRepository cardRepository;
-
-
-    public CardServiceImpl(CardRepository cardRepository) {
-        this.cardRepository = cardRepository;
-    }
-
-    @Override
-    public Response transfer(Request transferRequest) {
-        String fromCardNumber = transferRequest.getNumberFrom();
-        String toCardNumber = transferRequest.getNumberTo();
-        String cvv = transferRequest.getCvv();
-        String period = transferRequest.getValidTill();
-        int operationId = cardRepository.getId();
-        final Amount amount = transferRequest.getAmount();
-
-        cvvCheck(cvv);
-        cardCheck(fromCardNumber, toCardNumber);
-        dateCheck(period);
-        balanceChange(operationId);
-
-
-        final Amount amountFromTestingCard = new Amount(1000000, "RUR");
-        final Amount amountToTestingCard = new Amount(0, "RUR");
-        final Card currentTestingCardFrom = new Card(fromCardNumber, period, cvv, amountFromTestingCard);
-        final Card currentTestingCardTo = new Card(toCardNumber, "10/27", "097", amountToTestingCard);
-        int commission = amount.getValue() / 100;
-        if (balanceFromCardVerification(currentTestingCardFrom, commission, amount)) {
-            cardRepository.saveCard(currentTestingCardFrom, currentTestingCardTo);
-            final String confirmationCode = String.valueOf((int) (Math.random() * (9999 - 1000) + 1000));
-            cardRepository.saveTransfer(operationId, transferRequest);
-            cardRepository.saveCode(operationId, confirmationCode);
-            log.info("Новый перевод: Operation id {}, CardFrom {}, CardTo {}, amount {}, currency {}, commission {}",
-                    operationId, fromCardNumber, toCardNumber, amount.getValue(), amount.getCurrency(), commission);
-            return new Response(operationId);
-
-        }
-        throw new TransferErrorException("Transfer blocked");
-    }
+@Slf4j
+@RequiredArgsConstructor
+public class CardVerificationImpl implements CardVerification{
+    private final CardRepositoryImpl cardRepository;
 
     public boolean balanceFromCardVerification(Card cardFrom, int commission, Amount amountOperation) {
         int balanceOnCard = cardFrom.getAmount().getValue();
@@ -61,7 +24,6 @@ public class CardServiceImpl implements CardService {
         }
         return true;
     }
-
 
     @Override
     public void cardCheck(String cardNumberFrom, String cardNumberTo) {
@@ -105,7 +67,9 @@ public class CardServiceImpl implements CardService {
 
     }
 
-    @Override
+
+
+@Override
     public void balanceChange(int operationId) {
         Request requestInfo = cardRepository.getTransferRequest(operationId);
         Amount amount = requestInfo.getAmount();
@@ -121,18 +85,4 @@ public class CardServiceImpl implements CardService {
         log.info("Баланс карты отправителя {} равен {} ", cardNumberFrom, cardRepository.getCard(cardNumberFrom).getAmount());
         log.info("Баланс карты получателя {} равен {} ", cardNumberTo, cardRepository.getCard(cardNumberTo).getAmount());
     }
-
-    @Override
-    public Response confirmOperation(OperationRequest operationRequest) {
-        int operationId = operationRequest.getOperationId();
-        String operationCode = operationRequest.getOperationCode();
-        if (operationCode.equals(cardRepository.getCode(operationId)) || operationCode.equals("0000")) {
-            balanceChange(operationId);
-            log.info("Операция одобрена");
-            return new Response(operationId);
-
-        } else log.info("Операция не была подтверждена, отказано в списании денежных средств");
-        throw new NonConfirmException("Неверный код");
-    }
 }
-

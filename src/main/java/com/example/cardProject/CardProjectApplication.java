@@ -1,4 +1,4 @@
-package com.example.card_project;
+package com.example.cardProject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

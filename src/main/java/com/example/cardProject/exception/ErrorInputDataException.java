@@ -1,4 +1,4 @@
-package com.example.card_project.exception;
+package com.example.cardProject.exception;
 
 public class ErrorInputDataException extends RuntimeException {
     public ErrorInputDataException(String message) {

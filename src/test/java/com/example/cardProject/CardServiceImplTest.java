@@ -1,8 +1,10 @@
-package com.example.card_project;
+package com.example.cardProject;
 
-import com.example.card_project.model.*;
-import com.example.card_project.repository.CardRepositoryImpl;
-import com.example.card_project.service.CardServiceImpl;
+import com.example.cardProject.model.*;
+import com.example.cardProject.repository.CardRepositoryImpl;
+import com.example.cardProject.service.CardServiceImpl;
+import com.example.cardProject.service.CardVerification;
+import com.example.cardProject.service.CardVerificationImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +12,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDate;
@@ -24,6 +27,8 @@ import static org.mockito.Mockito.when;
 public class CardServiceImplTest {
     @InjectMocks
     CardServiceImpl cardServiceImpl;
+    @InjectMocks
+    CardVerificationImpl cardVerificationImpl;
 
     @Mock
     CardRepositoryImpl cardRepositoryImpl;
@@ -52,26 +57,27 @@ Card currentTestingCardTo=TEST_CARD_TO;
         doNothing().when(cardRepositoryImpl).saveTransfer(Integer.parseInt(operationId), transferRequest);
         doNothing().when(cardRepositoryImpl).saveCode(Integer.parseInt(operationId),confirmationCode);
 //then
-        Response transferResponseActual = cardServiceImpl.transfer(transferRequest);
-        assertEquals(expected.getOperationId(), transferResponseActual.getOperationId());
+       Response transferResponseActual = cardServiceImpl.transfer(transferRequest);
+        assertEquals(expected.operationId(), transferResponseActual.operationId());
     }
     @Test
         void confirmOperation() {
             //given
             OperationRequest operationRequest = new OperationRequest(Integer.parseInt(OPERATION_ID), CONFIRMATION_CODE);
-           int operationId = operationRequest.getOperationId();
+           int operationId = operationRequest.operationId();
 
             String operationCodeFromRepository = CONFIRMATION_CODE;
             Response responseExpected = new Response(operationId);
-            CardServiceImpl spy = Mockito.spy(cardServiceImpl);
+            CardVerificationImpl spy = Mockito.spy(cardVerificationImpl);
+            CardServiceImpl spy1 = Mockito.spy(cardServiceImpl);
 
             //when
             when(cardRepositoryImpl.getCode(operationId)).thenReturn(operationCodeFromRepository);
             Mockito.doNothing().when(spy).balanceChange(operationId);
 
             //then
-            Response responseActual = spy.confirmOperation(operationRequest);
-            assertEquals(responseExpected.getOperationId(), responseActual.getOperationId());
+            Response responseActual = spy1.confirmOperation(operationRequest);
+            assertEquals(responseExpected.operationId(), responseActual.operationId());
 
 
         }
@@ -146,7 +152,7 @@ Card currentTestingCardTo=TEST_CARD_TO;
         when(cardRepositoryImpl.getCard(cardNumberTo)).thenReturn(cardTo);
 
         //then
-        cardServiceImpl.balanceChange(Integer.parseInt(operationId));
+        cardVerificationImpl.balanceChange(Integer.parseInt(operationId));
 
         assertEquals(newBalanceCardFromExpected, cardFrom.getAmount().getValue());
         assertEquals(newBalanceCardToExpected, cardTo.getAmount().getValue());

@@ -1,7 +1,7 @@
-package com.example.card_project.repository;
+package com.example.cardProject.repository;
 
-import com.example.card_project.model.Card;
-import com.example.card_project.model.Request;
+import com.example.cardProject.model.Card;
+import com.example.cardProject.model.Request;
 
 public interface CardRepository {
      void saveTransfer(int operationId, Request request);

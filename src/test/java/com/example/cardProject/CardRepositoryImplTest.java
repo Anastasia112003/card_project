@@ -1,9 +1,9 @@
-package com.example.card_project;
+package com.example.cardProject;
 
-import com.example.card_project.model.Amount;
-import com.example.card_project.model.Card;
-import com.example.card_project.model.Request;
-import com.example.card_project.repository.CardRepositoryImpl;
+import com.example.cardProject.model.Amount;
+import com.example.cardProject.model.Card;
+import com.example.cardProject.model.Request;
+import com.example.cardProject.repository.CardRepositoryImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,4 +1,4 @@
-package com.example.card_project;
+package com.example.cardProject;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
