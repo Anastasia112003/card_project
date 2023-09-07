@@ -1,17 +1,19 @@
 package com.example.cardProject.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 
-public class Card {
-    private String cardNumber;
-    private String validTill;
-    private String cvv;
-    private Amount amount;
+@Getter
+
+public record Card(String number, String validTill, String cvv, Amount amount) {
+    public Card(String number, String validTill, String cvv, Amount amount) {
+        this.number = number;
+        this.validTill = validTill;
+        this.cvv = cvv;
+        this.amount = amount;
+    }
+
+
 }
 

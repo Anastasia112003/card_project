@@ -1,14 +1,11 @@
 package com.example.cardProject.exception;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 
-@Data
-@AllArgsConstructor
-public class ExceptionWebResponse {
+public record ExceptionWebResponse(String errorMessage, int id) {
 
-    private String errorMessage;
-    private int id;
-
+    public ExceptionWebResponse(String errorMessage, int id) {
+        this.errorMessage = errorMessage;
+        this.id = id;
+    }
 }

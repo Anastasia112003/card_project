@@ -45,8 +45,8 @@ public class CardRepositoryImpl implements CardRepository{
 
     @Override
     public void saveCard(Card currentTestingCardFrom, Card currentTestingCardTo) {
-        cards.put(currentTestingCardFrom.getCardNumber(),currentTestingCardFrom);
-        cards.put(currentTestingCardTo.getCardNumber(), currentTestingCardTo);
+        cards.put(currentTestingCardFrom.getNumber(),currentTestingCardFrom);
+        cards.put(currentTestingCardTo.getNumber(), currentTestingCardTo);
     }
 
     @Override

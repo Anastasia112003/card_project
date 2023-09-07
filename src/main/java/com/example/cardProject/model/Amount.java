@@ -2,12 +2,14 @@ package com.example.cardProject.model;
 
 import lombok.*;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class Amount {
+@Getter
+public record Amount(int value, String currency) {
+    public Amount(int value, String currency) {
+        this.value = value;
+        this.currency = currency;
+    }
 
-    private int value;
-    private String currency;
+    public void setValue(int newBalanceCardTo) {
+    }
 }
 
